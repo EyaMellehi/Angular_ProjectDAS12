@@ -1,17 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Conference } from '../../Model/conference';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Card } from '../card/card';
 @Component({
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,Card],
   selector: 'app-conference-list',
   styleUrl: './conference-list.css',
   templateUrl: './conference-list.html',
 })
 export class ConferenceList {
+  x=signal(2);
   searchItem='';
-  favList:Conference[]=[];
-  confList:Conference[]=[{
+  favList=signal<Conference[]>([]);
+  confList=signal<Conference[]>([{
 
     id: 1,
 
@@ -103,17 +105,24 @@ export class ConferenceList {
 
     },
 
-  ];
+  ]);
+  constructor() {
+    console.log(this.x());
+    this.x.set(3);
+    console.log(this.x());
+    this.x.update(x => x + 1);
+    console.log(this.x());
+  }
   addToFavorites(conf:Conference) {
-    if (this.favList.includes(conf)) {
+    if (this.favList().includes(conf)) {
       return alert('This conference is already in your favorites list.');
     }
-    return this.favList.push(conf);
+    return this.favList().push(conf);
   }
   addLike(conf:Conference) {
     return conf.nbLikes++;
   }
   filter() {
-    return this.confList.filter(conf => conf.titre.toLowerCase().includes(this.searchItem.toLowerCase()));
+    return this.confList().filter(conf => conf.titre.toLowerCase().includes(this.searchItem.toLowerCase()));
   }
 }
